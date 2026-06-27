@@ -216,3 +216,12 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+
+# Node/React junk (Make sure these are in your file!)
+node_modules/
+.pnp
+.pnp.js
+build/
+.env.local
+.env.development.local
