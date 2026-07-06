@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_BASE = "http://localhost:5000";
+const API_BASE = "https://product-sentiment-analyser.onrender.com";
 
 /**
  * Searches for a product and returns its sentiment analysis.
