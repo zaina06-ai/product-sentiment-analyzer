@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from dotenv import load_dotenv
+import os
 
 from scraper import search_product, get_reviews, ScrapeError
 from sentiment import analyze_reviews
@@ -9,7 +10,15 @@ from db import get_cached_result, save_result
 load_dotenv()
 
 app = Flask(__name__)
-CORS(app)  # allow the React dev server (different port) to call this API
+CORS(app)  # allow the React frontend to call this API
+
+
+@app.get("/")
+def home():
+    return jsonify({
+        "message": "Product Sentiment Analyzer API is running!",
+        "health": "/api/health"
+    })
 
 
 @app.get("/api/health")
@@ -45,10 +54,16 @@ def search():
         "summary": analysis["summary"],
         "reviews": analysis["reviews"],
     }
+
     save_result(query, response_data)
 
     return jsonify({**response_data, "cached": False})
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(
+        host="0.0.0.0",
+        port=port,
+        debug=False
+    )
