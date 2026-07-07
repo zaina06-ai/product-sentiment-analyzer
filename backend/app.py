@@ -23,6 +23,7 @@ def health():
 def search():
     query = request.args.get("q", "").strip()
     site = request.args.get("site", "flipkart").strip().lower()
+    force_refresh = request.args.get("refresh", "").lower() in ("1", "true", "yes")
 
     if not query:
         return jsonify({"error": "Please provide a search query (?q=...)."}), 400
@@ -33,9 +34,11 @@ def search():
         }), 400
 
     cache_key = f"{site}:{query}"
-    cached = get_cached_result(cache_key)
-    if cached:
-        return jsonify({**cached, "cached": True})
+
+    if not force_refresh:
+        cached = get_cached_result(cache_key)
+        if cached:
+            return jsonify({**cached, "cached": True})
 
     scraper = get_scraper(site)
     try:
@@ -62,4 +65,9 @@ def search():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    import os
+
+    port = int(os.environ.get("PORT", 5000))
+    debug = os.environ.get("FLASK_DEBUG", "false").lower() in ("1", "true", "yes")
+
+    app.run(host="0.0.0.0", port=port, debug=debug)
